@@ -1,0 +1,219 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#04253d"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/submitBar"
+        android:layout_width="fill_parent"
+        android:layout_height="45dip" >
+
+        <ImageView
+            android:id="@+id/titleBorder"
+            android:layout_width="wrap_content"
+            android:layout_height="60dip"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/titleFrame"
+            android:background="@drawable/title_border"
+            android:contentDescription="@string/description_none" />
+
+        <LinearLayout
+            android:id="@+id/titleFrame"
+            android:layout_width="wrap_content"
+            android:layout_height="60dip"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/title_frame"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/saveButton"
+                android:layout_width="wrap_content"
+                android:layout_height="35dip"
+                android:layout_marginRight="5dip"
+                android:background="@drawable/action_button"
+                android:shadowColor="@color/shadow"
+                android:shadowDx="0.2"
+                android:shadowDy="0.2"
+                android:shadowRadius="0.4"
+                android:text="@string/save_btn"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-25dip"
+        android:orientation="horizontal" >
+
+        <ImageButton
+            android:id="@+id/settings_button"
+            android:layout_width="80dip"
+            android:layout_height="80dip"
+            android:layout_margin="10dip"
+            android:background="@null"
+            android:contentDescription="@string/main_button_decription"
+            android:scaleType="fitCenter"
+            android:src="@drawable/settings" />
+
+        <TextView
+            android:id="@+id/section_name"
+            android:layout_width="fill_parent"
+            android:layout_height="70dip"
+            android:layout_marginTop="25dip"
+            android:text="@string/settings"
+            android:textSize="40sp" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="20dip"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/setting_text_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:gravity="center_vertical"
+            android:text="@string/ligtOnStartupDescription"
+            android:textSize="20sp" />
+
+        <ImageButton
+            android:id="@+id/info_button_1"
+            android:layout_width="25dip"
+            android:layout_height="25dip"
+            android:layout_marginLeft="5dip"
+            android:layout_toRightOf="@+id/setting_text_1"
+            android:background="@null"
+            android:contentDescription="@string/main_button_decription"
+            android:scaleType="fitCenter"
+            android:src="@drawable/info_sign_btn" />
+
+        <Switch
+            android:id="@+id/light_on_start_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="25dp"
+            android:textOff="OFF"
+            android:textOn="ON" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="50dip"
+        android:gravity="center_vertical" >
+
+        <TextView
+            android:id="@+id/time_to_sleep_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:text="@string/timeToSleepDescription"
+            android:textSize="20sp" />
+
+        <ImageButton
+            android:id="@+id/info_button_2"
+            android:layout_width="25dip"
+            android:layout_height="25dip"
+            android:layout_marginLeft="5dip"
+            android:layout_toRightOf="@+id/time_to_sleep_text"
+            android:background="@null"
+            android:contentDescription="@string/main_button_decription"
+            android:scaleType="fitCenter"
+            android:src="@drawable/info_sign_btn" />
+
+        <Switch
+            android:id="@+id/time_to_sleep"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="25dp"
+            android:textOff="OFF"
+            android:textOn="ON" />
+
+        <LinearLayout
+            android:id="@+id/time_to_sleep_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/time_to_sleep_text"
+            android:layout_marginLeft="15dip"
+            android:layout_marginTop="15dip"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:layout_width="25dip"
+                android:layout_height="25dip"
+                android:layout_marginLeft="25dp"
+                android:background="@drawable/suboption_arrow"
+                android:contentDescription="@string/description_none" />
+
+            <TextView
+                android:id="@+id/timeToSleepText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dip"
+                android:text="@string/timeToSleepSuboptionPart1"
+                android:textSize="15sp" />
+
+            <ImageButton
+                android:id="@+id/edit_btn"
+                android:layout_width="25dip"
+                android:layout_height="25dip"
+                android:layout_marginLeft="5dip"
+                android:background="@null"
+                android:contentDescription="@string/main_button_decription"
+                android:scaleType="fitCenter"
+                android:src="@drawable/edit_btn" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="50dip"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/language_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            android:gravity="center_vertical"
+            android:text="@string/languageSelectionDescription"
+            android:textSize="20sp" />
+
+        <ImageButton
+            android:id="@+id/info_button_3"
+            android:layout_width="25dip"
+            android:layout_height="25dip"
+            android:layout_marginLeft="5dip"
+            android:layout_toRightOf="@+id/language_setting"
+            android:background="@null"
+            android:contentDescription="@string/main_button_decription"
+            android:scaleType="fitCenter"
+            android:src="@drawable/info_sign_btn" />
+
+        <Spinner
+            android:id="@+id/language_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="25dp" />
+    </RelativeLayout>
+
+</LinearLayout>

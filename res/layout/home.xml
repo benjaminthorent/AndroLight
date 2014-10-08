@@ -1,0 +1,108 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#04253d" >
+
+    <ImageButton
+        android:id="@+id/main_button"
+        android:layout_width="320dip"
+        android:layout_height="320dip"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:background="@null"
+        android:contentDescription="@string/main_button_decription"
+        android:scaleType="centerInside"
+        android:src="@drawable/button_off" />
+
+    <ImageButton
+        android:id="@+id/settings_button"
+        android:layout_width="100dip"
+        android:layout_height="100dip"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="-30dip"
+        android:layout_marginTop="-30dip"
+        android:background="@null"
+        android:contentDescription="@string/main_button_decription"
+        android:scaleType="fitCenter"
+        android:src="@drawable/settings_btn" />
+
+    <RelativeLayout
+        android:id="@+id/timer_section"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="10dip" >
+
+        <LinearLayout
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="40dip"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/title_frame_left"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingLeft="10dip"
+            android:paddingRight="10dip" >
+
+            <ProgressBar
+                android:id="@+id/timer_progressbar"
+                style="@style/CustomBlueProgressBar"
+                android:layout_width="150dip"
+                android:layout_height="20dip"
+                android:max="100"
+                android:progress="80" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/timer"
+            android:layout_width="60dip"
+            android:layout_height="40dip"
+            android:layout_alignBottom="@+id/progress"
+            android:layout_toRightOf="@+id/progress"
+            android:background="@drawable/title_frame_left"
+            android:orientation="vertical"
+            android:padding="5dip" >
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:background="@drawable/textfield_default"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/timer_remaining_time"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/noTimeSet"
+                    android:textColor="#535353"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/border"
+            android:layout_width="40dip"
+            android:layout_height="40dip"
+            android:layout_toRightOf="@+id/timer"
+            android:background="@drawable/action_timer_btn"
+            android:contentDescription="@string/description_none" />
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="20dip"
+            android:layout_height="20dip"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:layout_toRightOf="@+id/timer"
+            android:background="@drawable/reload"
+            android:contentDescription="@string/description_none" />
+    </RelativeLayout>
+
+</RelativeLayout>

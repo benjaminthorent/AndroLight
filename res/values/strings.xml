@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Light</string>
+    <string name="title_activity_light">LightActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="main_button_decription">On/Off button</string>
+    <string name="ligtOnStartupDescription">Light on startup</string>
+    <string name="ligtOnStartupDetails">This option, if activated, turns light on immediately when starting the application.</string>
+    <string name="timeToSleepDescription">Auto shut down</string>
+    <string name="timeToSleepDetails">Use this option to activate a timer which will automatically shut light down when time limit is reached (useful to save battery when light left activated fo too long by mistake). \n\nThe time limit is configurable (up to 10:45mins).</string>
+    <string name="timeToSleepSuboptionPart1">Shut light down after</string>
+    <string name="timeToSleepSuboptionPart2">mins.</string>
+    <string name="timeToSleepDialogTitle">Shut light down after (mins):</string>
+    <string name="defaultTimeToSleepSuboption">2</string>
+    <string name="settingsUpdateOK">Settings successfully updated !</string>
+    <string name="OKoption">OK</string>
+    <string name="noTimeSet">--:--</string>
+    <string name="application_logo_text">Application logo</string>
+    <string name="settings">Settings</string>
+    <string name="description_none">No description</string>
+    <string name="save_btn">Save</string>
+    <string name="time_set">Set</string>
+    <string name="cancel">Cancel</string>
+    <string name="set_btn">set</string>
+    <string name="configurationIssue">Invalid configuration</string>
+    <string name="configurationIssueDetails">Please provide a timer limit exceeding 0ms.</string>
+    <string name="languageEnglish">English</string>
+    <string name="languageFrench">Français</string>
+    <string name="languageSelectionDescription">App Language</string>
+    <string name="languageSelectionDetails">Language to be used throughout the application.</string>
+   
+</resources>

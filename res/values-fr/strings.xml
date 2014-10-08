@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Light</string>
+    <string name="title_activity_light">LightActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="ligtOnStartupDescription">Éclairer au démarrage</string>
+    <string name="ligtOnStartupDetails">Cette option, si activée, entraîne l\'allumage automatique de la lumière au démarrage de l\'application.</string>
+    <string name="timeToSleepDescription">Extinction auto</string>
+    <string name="timeToSleepDetails">Utiliser cette option afin d\'activer un minuteur qui éteindra automatiquement la lampe après une durée donnée (particulièrement utile pour économiser la batterie lorsque la lampe est, par erreur, laissée allumée trop longtemps).\n\nLa durée du minuteur est configurable (jusqu\'à 10:45mins).</string>
+    <string name="timeToSleepSuboptionPart1">Éteindre la lumière après</string>
+    <string name="timeToSleepSuboptionPart2">mins.</string>
+    <string name="timeToSleepDialogTitle">Éteindre la lumière après (mins):</string>
+    <string name="defaultTimeToSleepSuboption">2</string>
+    <string name="settingsUpdateOK">Réglagles mis à jour !</string>
+    <string name="OKoption">OK</string>
+    <string name="noTimeSet">--:--</string>
+    <string name="application_logo_text">Application logo</string>
+    <string name="settings">Réglages</string>
+    <string name="description_none">Aucune description</string>
+    <string name="save_btn">Sauvegarder</string>
+    <string name="time_set">Définir</string>
+    <string name="cancel">Annuler</string>
+    <string name="set_btn">définir</string>
+    <string name="configurationIssue">Configuration erronée</string>
+    <string name="configurationIssueDetails">La durée du minuteur doit excéder 0ms.</string>
+    <string name="languageEnglish">English</string>
+    <string name="languageFrench">Français</string>
+    <string name="languageSelectionDescription">Langue</string>
+    <string name="languageSelectionDetails">Langue à utiliser dans l\'application.</string>
+    
+</resources>
