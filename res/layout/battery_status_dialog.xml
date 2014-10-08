@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/battery_level"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="15dp"
+        android:drawableLeft="@drawable/ic_action_battery"
+        android:gravity="center_vertical"
+        android:padding="5dp"
+        android:text="My Compound Button" />
+
+    <TextView
+        android:id="@+id/battery_temperature"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:drawableLeft="@drawable/ic_action_about"
+        android:gravity="center_vertical"
+        android:padding="5dp"
+        android:text="My Compound Button" />
+    
+    <TextView
+        android:id="@+id/battery_technology"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:drawableLeft="@drawable/ic_action_settings"
+        android:gravity="center_vertical"
+        android:padding="5dp"
+        android:text="My Compound Button" />
+    
+        <TextView
+        android:id="@+id/battery_health"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="15dp"
+        android:drawableLeft="@drawable/ic_action_favorite"
+        android:gravity="center_vertical"
+        android:padding="5dp"
+        android:text="My Compound Button" />
+
+</LinearLayout>

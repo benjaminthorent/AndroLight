@@ -1,34 +1,44 @@
 package com.benfactory.light;
 
+import java.io.IOException;
 import java.util.Locale;
+
+import javax.security.auth.callback.Callback;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.hardware.Camera;
-import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.Parameters;
+import android.os.BatteryManager;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class LightActivity extends Activity {
+public class LightActivity extends Activity implements Callback, android.view.SurfaceHolder.Callback {
 
 	private Camera cam;
 	private ImageButton mainButton;
-	private ImageButton settingsButton;
 	private RelativeLayout timerSection;
 	private ProgressBar progressBar;
 	private TextView remainingTime;
 	private ImageButton reloadTimerButton;
+	private SurfaceHolder mHolder;
 
 	boolean lightIsOn = false;
 	private CustomCountDownTimer timer = null;
@@ -37,7 +47,7 @@ public class LightActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		//requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.home); 
 
 		/*
@@ -48,6 +58,14 @@ public class LightActivity extends Activity {
 		// Set app language as per settings
 		setAppLanguage();
 
+		/*
+		 * 
+		 */
+		SurfaceView preview = (SurfaceView)findViewById(R.id.PREVIEW);
+		mHolder = preview.getHolder();
+		mHolder.addCallback(this);
+		
+		
 		/*
 		 * Get and set all graphical elements 
 		 */
@@ -63,13 +81,13 @@ public class LightActivity extends Activity {
 		});
 
 		// Settings Button
-		settingsButton = (ImageButton) findViewById(R.id.settings_button);
+		/*settingsButton = (ImageButton) findViewById(R.id.settings_button);
 		settingsButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent intent = new Intent(LightActivity.this, SettingsActivity.class);
 				startActivity(intent);
 			}
-		});
+		});*/
 
 		// Timer section
 		timerSection = (RelativeLayout) findViewById(R.id.timer_section);
@@ -91,6 +109,66 @@ public class LightActivity extends Activity {
 		 * Update all display
 		 */
 		updateFullDisplay();
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.light, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+		case R.id.action_settings:
+			Intent settingsIntent = new Intent(LightActivity.this, SettingsActivity.class);
+			startActivity(settingsIntent);
+			return true;
+		case R.id.action_battery:
+			
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			LayoutInflater inflater = LightActivity.this.getLayoutInflater();
+			builder.setTitle("Battery Information")
+			       .setView(inflater.inflate(R.layout.battery_status_dialog, null))
+			       .setCancelable(false)
+			       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			           public void onClick(DialogInterface dialog, int id) {
+			                //do things
+			           }
+			       })
+			       .setIcon(android.R.drawable.ic_dialog_info);
+			AlertDialog alert = builder.create();
+			
+			alert.show();	
+			
+			//Updates
+			Intent i = new ContextWrapper(getApplicationContext()).registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+			int temp =i.getIntExtra(BatteryManager.EXTRA_TEMPERATURE,0);
+			int level = i.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+			int scale = i.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+			int health = i.getIntExtra(BatteryManager.EXTRA_HEALTH, -1);
+			String tech = i.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY);
+			String healthStatus = (health==BatteryManager.BATTERY_HEALTH_GOOD ? "Good battery health !" : "You might face some issues with your battery :(...");
+			
+			((TextView)alert.findViewById(R.id.battery_level)).setText("Battery level : " + level + "%");
+			((TextView)alert.findViewById(R.id.battery_temperature)).setText("Temperature : " + temp/10 + "°C");
+			((TextView)alert.findViewById(R.id.battery_technology)).setText("Technology : " + tech);
+			((TextView)alert.findViewById(R.id.battery_health)).setText(healthStatus);
+
+			return true;
+		case R.id.action_more_info:
+			Intent moreInfoIntent = new Intent(LightActivity.this, Settings2Activity.class);
+			startActivity(moreInfoIntent);
+			return true;
+		case R.id.action_give_me_a_beer:
+			Intent supportUsIntent = new Intent(LightActivity.this, SupportMeActivity.class);
+			startActivity(supportUsIntent);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -118,7 +196,13 @@ public class LightActivity extends Activity {
 			return;
 		} else {
 			if(cam==null || !cam.getParameters().getFlashMode().equals(Parameters.FLASH_MODE_TORCH)){
-				cam = Camera.open();     
+				cam = Camera.open();   
+				try {
+					cam.setPreviewDisplay(mHolder);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				Parameters params = cam.getParameters();
 				params.setFlashMode(Parameters.FLASH_MODE_TORCH);
 				cam.setParameters(params);
@@ -245,6 +329,21 @@ public class LightActivity extends Activity {
 	public void onStop() {
 		lightOff();
 		super.onStop();
+	}
+
+	@Override
+	public void surfaceCreated(SurfaceHolder holder) {
+		mHolder = holder;
+	}
+
+	@Override
+	public void surfaceChanged(SurfaceHolder holder, int format, int width,
+			int height) {		
+	}
+
+	@Override
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		mHolder = null;
 	}
 
 }

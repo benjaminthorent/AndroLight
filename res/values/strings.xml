@@ -8,7 +8,7 @@
     <string name="ligtOnStartupDescription">Light on startup</string>
     <string name="ligtOnStartupDetails">This option, if activated, turns light on immediately when starting the application.</string>
     <string name="timeToSleepDescription">Auto shut down</string>
-    <string name="timeToSleepDetails">Use this option to activate a timer which will automatically shut light down when time limit is reached (useful to save battery when light left activated fo too long by mistake). \n\nThe time limit is configurable (up to 10:45mins).</string>
+    <string name="timeToSleepDetails">Use this option to activate a timer which will automatically shut light down when time limit is reached (useful to save battery when light left activated fo too long by mistake). The time limit is configurable (up to 10:45mins).</string>
     <string name="timeToSleepSuboptionPart1">Shut light down after</string>
     <string name="timeToSleepSuboptionPart2">mins.</string>
     <string name="timeToSleepDialogTitle">Shut light down after (mins):</string>
@@ -28,6 +28,11 @@
     <string name="languageEnglish">English</string>
     <string name="languageFrench">Français</string>
     <string name="languageSelectionDescription">App Language</string>
-    <string name="languageSelectionDetails">Language to be used throughout the application.</string>
-   
+    <string name="languageSelectionDetails">Language used in the app.</string>
+    <string name="action_battery">Battery Info</string>
+    <string name="more_info">More Info</string>
+    <string name="give_me_a_beer">Give me a beer</string>
+	<string name="more_info_content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+    <string name="support_us_content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+	
 </resources>

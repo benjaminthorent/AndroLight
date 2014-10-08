@@ -4,6 +4,11 @@
     android:layout_height="fill_parent"
     android:background="#04253d" >
 
+    <SurfaceView
+        android:id="@+id/PREVIEW"
+        android:layout_width="1dp"
+        android:layout_height="1dp" />
+
     <ImageButton
         android:id="@+id/main_button"
         android:layout_width="320dip"
@@ -14,19 +19,6 @@
         android:contentDescription="@string/main_button_decription"
         android:scaleType="centerInside"
         android:src="@drawable/button_off" />
-
-    <ImageButton
-        android:id="@+id/settings_button"
-        android:layout_width="100dip"
-        android:layout_height="100dip"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="-30dip"
-        android:layout_marginTop="-30dip"
-        android:background="@null"
-        android:contentDescription="@string/main_button_decription"
-        android:scaleType="fitCenter"
-        android:src="@drawable/settings_btn" />
 
     <RelativeLayout
         android:id="@+id/timer_section"
