@@ -16,7 +16,7 @@
     <string name="OKoption">OK</string>
     <string name="noTimeSet">--:--</string>
     <string name="application_logo_text">Application logo</string>
-    <string name="settings">Réglages</string>
+     <string name="settings_activity_title">Réglages</string>
     <string name="description_none">Aucune description</string>
     <string name="save_btn">Sauvegarder</string>
     <string name="time_set">Définir</string>

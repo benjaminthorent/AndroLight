@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Locale;
 
 import com.benfactory.light.PreferencesHandler.Language;
-import com.benfactory.light.TimePicker.TimePickerType;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -18,14 +17,11 @@ import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.os.BatteryManager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,7 +33,6 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -45,7 +40,6 @@ import android.widget.AdapterView.OnItemSelectedListener;
 public class SettingsActivity extends Activity {
 
 	private PreferencesHandler ph;
-	private TextView timeToSleepText;
 	private long timeToSleepDuration;
 	private int lowBatteryWarningThreshold;
 
@@ -160,63 +154,138 @@ public class SettingsActivity extends Activity {
 		case R.id.action_save:
 			saveSettings();
 			return true;
+		case android.R.id.home:
+			showPopupSettingsUnsaved();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
+	
+	@Override
+    public void onBackPressed()
+    {
+		showPopupSettingsUnsaved();
+    }
 
 	private void saveSettings(){
 
-		StringBuilder errorSsb = new StringBuilder();
+		StringBuilder errorSettingsDetails = new StringBuilder();
 		/*sb.append("select id1, ");
 		sb.append(id2);
 		sb.append(" from ");
 		sb.append(table);*/
-		
-		if(performSettingsPreCheck()) {
-			Toast.makeText(getApplicationContext(), R.string.settingsUpdateOK, Toast.LENGTH_SHORT).show();
-			if(){
-				Toast.makeText(getApplicationContext(), "Test", Toast.LENGTH_SHORT).show();
-			}
-			// Save preferences
-			ph.saveSettings(((CheckBox)findViewById(R.id.light_on_start_up_checkbox)).isChecked(), 
-					((CheckBox)findViewById(R.id.time_to_sleep_checkbox)).isChecked(), 
-					timeToSleepDuration, 
-					((CheckBox)findViewById(R.id.low_battery_warning_checkbox)).isChecked(),
-					lowBatteryWarningThreshold,
-					Language.getLocaleStringFromIndex(((Spinner)findViewById(R.id.language_spinner)).getSelectedItemPosition()));
-			// Force setting nav bar update
-			this.getActionBar().setTitle(getString(R.string.settings_activity_title));
-			if(false){
-				Intent mStartActivity = new Intent(getApplicationContext(), SettingsActivity.class);
-				int mPendingIntentId = 123456;
-				PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), mPendingIntentId,    mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
-				AlarmManager mgr = (AlarmManager)getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-				mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
-				System.exit(0);
-			}
-			this.finish();
+
+		if(performSettingsPreCheck(errorSettingsDetails)) {
+			if(!ph.getLanguage().equalsIgnoreCase(Language.getLocaleStringFromIndex(((Spinner)findViewById(R.id.language_spinner)).getSelectedItemPosition()))){
+				Builder alert = new AlertDialog.Builder(SettingsActivity.this);
+				alert.setTitle("App will restart");
+				alert.setMessage("Please note that your app will restart since your performed a language change in order to take this one into consideration. This is completely expected behaviour :).");
+				alert.setIcon(android.R.drawable.ic_dialog_alert);
+				alert.setPositiveButton(R.string.OKoption,new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						Toast.makeText(getApplicationContext(), R.string.settingsUpdateOK, Toast.LENGTH_SHORT).show();
+						// Save preferences
+						saveDataIntoPreferenceHandler();
+						// Force app restart to force language update
+						forceAppRestart();
+					}
+				});
+				alert.show();
+			} else {
+				Toast.makeText(getApplicationContext(), R.string.settingsUpdateOK, Toast.LENGTH_SHORT).show();
+				// Save preferences
+				saveDataIntoPreferenceHandler();
+				// Go back to home page
+				this.finish();
+			}			
 		} else {
 			// raise warning message
 			Builder alert = new AlertDialog.Builder(SettingsActivity.this);
 			alert.setTitle(R.string.configurationIssue);
-			alert.setMessage(R.string.configurationIssueDetails);
+			alert.setMessage("Your current settings contain some impossible associations. Please update them.\n" + errorSettingsDetails.toString());
 			alert.setIcon(android.R.drawable.ic_dialog_alert);
 			alert.setPositiveButton(R.string.OKoption,null);
 			alert.show();
 		}
-		
+
 	}
 
-	private boolean performSettingsPreCheck() {
+	private void showPopupSettingsUnsaved(){
+		if(ph.isSettingsWarningOnBackToBeShown()){
+			
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			final View view = SettingsActivity.this.getLayoutInflater().inflate(R.layout.settings_not_saved_dialog, null);
+			builder.setTitle("You will loose your settings !")
+			.setView(view)
+			.setCancelable(false)
+			.setPositiveButton(R.string.OKoption, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					if(((CheckBox)view.findViewById(R.id.deactivate_warning_checkbox)).isChecked()){
+						PreferencesHandler preferenceshandler = new PreferencesHandler(getApplicationContext());
+						preferenceshandler.deActivateShowSettingsWarningOnBack();
+					}
+					SettingsActivity.this.finish();
+				}
+			})
+			.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					//do nothing
+				}
+			})
+			.setIcon(android.R.drawable.ic_dialog_alert);
+			final AlertDialog alert = builder.create();
+			alert.show();	
+		} else {
+			this.finish();
+		}
+	}
+
+
+
+	private void saveDataIntoPreferenceHandler() {
+		ph.saveSettings(((CheckBox)findViewById(R.id.light_on_start_up_checkbox)).isChecked(), 
+				((CheckBox)findViewById(R.id.time_to_sleep_checkbox)).isChecked(), 
+				timeToSleepDuration, 
+				((CheckBox)findViewById(R.id.low_battery_warning_checkbox)).isChecked(),
+				lowBatteryWarningThreshold,
+				Language.getLocaleStringFromIndex(((Spinner)findViewById(R.id.language_spinner)).getSelectedItemPosition()));
+	}
+
+
+
+	private void forceAppRestart() {
+		Intent mStartActivity = new Intent(getApplicationContext(), LightActivity.class);
+		int mPendingIntentId = 123456;
+		PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), mPendingIntentId,    mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+		AlarmManager mgr = (AlarmManager)getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+		mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+		final Handler handler = new Handler();
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				System.exit(0);
+			}
+		}, 100);
+
+	}
+
+	private boolean performSettingsPreCheck(StringBuilder errorSettingsDetails) {
 		boolean preChecksResult = true;
-		
+
 		// Auto Shut Down feature prechecks
 		// Settings are not correct if feature activated and corresponding time not >0
-		preChecksResult &= ((!((CheckBox)findViewById(R.id.time_to_sleep_checkbox)).isChecked()) || timeToSleepDuration>0);
+		if(((CheckBox)findViewById(R.id.time_to_sleep_checkbox)).isChecked() && timeToSleepDuration==0){
+			errorSettingsDetails.append("\n" + getString(R.string.configurationTimeToSleepIssueDetails));
+			preChecksResult = false;
+		}
+
 		// Low Battery Warning feature prechecks
 		// Settings are not correct (or do not make sense) if feature activated and corresponding threshold not >0
-		preChecksResult &= ((!((CheckBox)findViewById(R.id.low_battery_warning_checkbox)).isChecked()) || lowBatteryWarningThreshold>0);
+		if(((CheckBox)findViewById(R.id.low_battery_warning_checkbox)).isChecked() && lowBatteryWarningThreshold==0){
+			errorSettingsDetails.append("\n" + getString(R.string.configurationLowBatteryWarningIssueDetails));
+			preChecksResult = false;
+		}
 		return preChecksResult;
 	}
 

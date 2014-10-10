@@ -19,7 +19,8 @@ public class PreferencesHandler {
 		TIME_TO_SLEEP_DURATION,
 		LOW_BATTERY_WARNING_ACTIVATED,
 		LOW_BATTERY_WARNING_THRESHOLD,
-		LANGUAGE_LOCALE;
+		LANGUAGE_LOCALE,
+		SHOW_SETTINGS_WARNING_ON_BACK;
 	}
 	
 	public enum Language {
@@ -129,6 +130,30 @@ public class PreferencesHandler {
 	
 	public int getDefaultLanguageIndex(){
 		return Language.getDefaultItemPositionForLocale(sharedPrefs.getString(Settings.LANGUAGE_LOCALE.toString(), defaultLanguage));
+	}
+	
+	public void deActivateShowSettingsWarningOnBack () 
+	{
+		Editor edit = sharedPrefs.edit();
+		// Set changes to perform
+		edit.putBoolean(Settings.SHOW_SETTINGS_WARNING_ON_BACK.toString(), false);
+		// Save preferences
+		edit.apply();
+	}
+	
+	public void activateShowSettingsWarningOnBack () 
+	{
+		Editor edit = sharedPrefs.edit();
+		// Set changes to perform
+		edit.putBoolean(Settings.SHOW_SETTINGS_WARNING_ON_BACK.toString(), true);
+		// Save preferences
+		edit.apply();
+	}
+	
+	
+	public boolean isSettingsWarningOnBackToBeShown () 
+	{
+		return sharedPrefs.getBoolean(Settings.SHOW_SETTINGS_WARNING_ON_BACK.toString(), true);
 	}
 
 }

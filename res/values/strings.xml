@@ -25,7 +25,8 @@
     <string name="cancel">Cancel</string>
     <string name="set_btn">set</string>
     <string name="configurationIssue">Invalid configuration</string>
-    <string name="configurationIssueDetails">Please provide a timer limit exceeding 0ms.</string>
+    <string name="configurationTimeToSleepIssueDetails">* Please provide a timer limit exceeding 0ms.</string>
+    <string name="configurationLowBatteryWarningIssueDetails">* Please provide a battery threshold exceeding 0%.</string>
     <string name="languageEnglish">English</string>
     <string name="languageFrench">Français</string>
     <string name="languageSelectionDescription">App Language</string>

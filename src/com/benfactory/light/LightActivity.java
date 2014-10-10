@@ -125,7 +125,11 @@ public class LightActivity extends Activity implements Callback, android.view.Su
 			startActivity(settingsIntent);
 			return true;
 		case R.id.action_battery:
-
+			// TODO remove
+			PreferencesHandler preferenceshandler = new PreferencesHandler(getApplicationContext());
+			preferenceshandler.activateShowSettingsWarningOnBack();
+			// TODO end
+			
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			LayoutInflater inflater = LightActivity.this.getLayoutInflater();
 			builder.setTitle("Battery Information")
