@@ -1,20 +1,41 @@
 package com.benfactory.light;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
 import com.benfactory.light.PreferencesHandler.Language;
+import com.benfactory.light.TimePicker.TimePickerType;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.os.BatteryManager;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -26,6 +47,7 @@ public class SettingsActivity extends Activity {
 	private PreferencesHandler ph;
 	private TextView timeToSleepText;
 	private long timeToSleepDuration;
+	private int lowBatteryWarningThreshold;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -35,7 +57,8 @@ public class SettingsActivity extends Activity {
 
 		// Init preferences handler
 		ph = new PreferencesHandler(getApplicationContext());
-
+		lowBatteryWarningThreshold = ph.getLowBatteryWarningThreshold();
+		timeToSleepDuration = ph.getTimeToSleepAsMs();
 
 		// Set language spinner
 		Spinner languageSpinner = (Spinner) findViewById(R.id.language_spinner);
@@ -65,27 +88,113 @@ public class SettingsActivity extends Activity {
 
 		// Update as per current preferences
 		((CheckBox)findViewById(R.id.light_on_start_up_checkbox)).setChecked(ph.isLightOnStartUp());
-		/*((Switch)findViewById(R.id.time_to_sleep)).setChecked(ph.isTimeToSleepActivated());
-
-		if(ph.isTimeToSleepActivated()){
-			ll.setAlpha(1);
-			//et.setEnabled(true);
-		} else {
-			ll.setAlpha(0.4f);
-			//et.setEnabled(false);
-		}*/
 		((Spinner)findViewById(R.id.language_spinner)).setSelection(ph.getDefaultLanguageIndex());
+
+		LinearLayout emailMeSection =(LinearLayout) findViewById(R.id.email_me_section);
+		emailMeSection.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				startSendEmailActivity();
+			}
+		});
+
+		LinearLayout moreInfoSection =(LinearLayout) findViewById(R.id.more_info_section);
+		moreInfoSection.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				displayMoreInfoPopup();
+			}
+		});
+
+		CheckBox timeToSleepCheckbox = (CheckBox) findViewById (R.id.time_to_sleep_checkbox);
+		timeToSleepCheckbox.setChecked(ph.isTimeToSleepActivated());
+		timeToSleepCheckbox.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				handleAutoShutDownSubDetailsDisplay();
+			}});
+
+		CheckBox lowBatteryWarningCheckbox = (CheckBox) findViewById (R.id.low_battery_warning_checkbox);
+		lowBatteryWarningCheckbox.setChecked(ph.isLowBatteryWarningActivated());
+		lowBatteryWarningCheckbox.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				handleLowBatteryWarningSubDetailsDisplay();
+			}});
+
+		Button timeToSleepTimesetBtn = (Button) findViewById (R.id.time_to_sleep_timeset_btn);
+		timeToSleepTimesetBtn.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				showAutoShutDownPopup();
+			}
+		});
+
+		Button lowBatteryWarningThresholdBtn = (Button) findViewById (R.id.low_battery_warning_threshold_btn);
+		lowBatteryWarningThresholdBtn.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				showLowBatteryWarningPopup();
+			}
+		});
+
+		// Update display
+		handleAutoShutDownSubDetailsDisplay();
+		handleLowBatteryWarningSubDetailsDisplay();
+		updateLowBatteryWarningThresholdDisplay();
+		updateTimeToSleepTimerDisplay();
+
 	}
-	
+
+
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.settings, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+		case R.id.action_save:
+			saveSettings();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+
 	private void saveSettings(){
-		if((!((CheckBox)findViewById(R.id.time_to_sleep_checkbox)).isChecked())||timeToSleepDuration>0){
+
+		StringBuilder errorSsb = new StringBuilder();
+		/*sb.append("select id1, ");
+		sb.append(id2);
+		sb.append(" from ");
+		sb.append(table);*/
+		
+		if(performSettingsPreCheck()) {
 			Toast.makeText(getApplicationContext(), R.string.settingsUpdateOK, Toast.LENGTH_SHORT).show();
+			if(){
+				Toast.makeText(getApplicationContext(), "Test", Toast.LENGTH_SHORT).show();
+			}
 			// Save preferences
 			ph.saveSettings(((CheckBox)findViewById(R.id.light_on_start_up_checkbox)).isChecked(), 
 					((CheckBox)findViewById(R.id.time_to_sleep_checkbox)).isChecked(), 
 					timeToSleepDuration, 
+					((CheckBox)findViewById(R.id.low_battery_warning_checkbox)).isChecked(),
+					lowBatteryWarningThreshold,
 					Language.getLocaleStringFromIndex(((Spinner)findViewById(R.id.language_spinner)).getSelectedItemPosition()));
-			// End settings activity
+			// Force setting nav bar update
+			this.getActionBar().setTitle(getString(R.string.settings_activity_title));
+			if(false){
+				Intent mStartActivity = new Intent(getApplicationContext(), SettingsActivity.class);
+				int mPendingIntentId = 123456;
+				PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), mPendingIntentId,    mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+				AlarmManager mgr = (AlarmManager)getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+				mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+				System.exit(0);
+			}
 			this.finish();
 		} else {
 			// raise warning message
@@ -96,6 +205,234 @@ public class SettingsActivity extends Activity {
 			alert.setPositiveButton(R.string.OKoption,null);
 			alert.show();
 		}
+		
 	}
+
+	private boolean performSettingsPreCheck() {
+		boolean preChecksResult = true;
+		
+		// Auto Shut Down feature prechecks
+		// Settings are not correct if feature activated and corresponding time not >0
+		preChecksResult &= ((!((CheckBox)findViewById(R.id.time_to_sleep_checkbox)).isChecked()) || timeToSleepDuration>0);
+		// Low Battery Warning feature prechecks
+		// Settings are not correct (or do not make sense) if feature activated and corresponding threshold not >0
+		preChecksResult &= ((!((CheckBox)findViewById(R.id.low_battery_warning_checkbox)).isChecked()) || lowBatteryWarningThreshold>0);
+		return preChecksResult;
+	}
+
+
+
+	private void startSendEmailActivity() {
+		Intent email = new Intent(Intent.ACTION_SEND);
+		email.putExtra(Intent.EXTRA_EMAIL, new String[] { "b.thorent@gmail.com" });
+		email.putExtra(Intent.EXTRA_SUBJECT, "[AndroLight] Support");
+		email.putExtra(Intent.EXTRA_TEXT, "");
+		email.setType("message/rfc822");
+		startActivity(Intent.createChooser(email, "Choose an Email client"));
+	}
+
+	private void displayMoreInfoPopup() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("More Info")
+		.setMessage("Very interesting information...")
+		.setCancelable(false)
+		.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				//do things
+			}
+		})
+		.setIcon(android.R.drawable.ic_dialog_info);
+		AlertDialog alert = builder.create();
+
+		alert.show();
+	}
+
+	private void handleAutoShutDownSubDetailsDisplay(){
+
+		CheckBox timeToSleepCheckbox = (CheckBox) findViewById(R.id.time_to_sleep_checkbox);
+		TextView timeToSleepTimeSetText = (TextView) findViewById(R.id.time_to_sleep_timeset_text);
+		Button timeToSleepTimeSetBtn = (Button) findViewById(R.id.time_to_sleep_timeset_btn);
+
+		if(timeToSleepCheckbox.isChecked()){
+			timeToSleepTimeSetBtn.setEnabled(true);
+			timeToSleepTimeSetBtn.setAlpha((float) 1);
+			timeToSleepTimeSetText.setAlpha((float) 1);
+		} else {
+			timeToSleepTimeSetBtn.setEnabled(false);
+			timeToSleepTimeSetBtn.setAlpha((float) 0.2);
+			timeToSleepTimeSetText.setAlpha((float) 0.2);
+		}
+
+	}
+
+	private void handleLowBatteryWarningSubDetailsDisplay(){
+
+		CheckBox timeToSleepCheckbox = (CheckBox) findViewById(R.id.low_battery_warning_checkbox);
+		TextView timeToSleepTimeSetText = (TextView) findViewById(R.id.low_battery_warning_threshold_text);
+		Button timeToSleepTimeSetBtn = (Button) findViewById(R.id.low_battery_warning_threshold_btn);
+
+		if(timeToSleepCheckbox.isChecked()){
+			timeToSleepTimeSetBtn.setEnabled(true);
+			timeToSleepTimeSetBtn.setAlpha((float) 1);
+			timeToSleepTimeSetText.setAlpha((float) 1);
+		} else {
+			timeToSleepTimeSetBtn.setEnabled(false);
+			timeToSleepTimeSetBtn.setAlpha((float) 0.2);
+			timeToSleepTimeSetText.setAlpha((float) 0.2);
+		}
+
+	}
+
+	private void updateLowBatteryWarningThresholdDisplay() {
+		if(lowBatteryWarningThreshold==0){
+			((TextView) findViewById(R.id.low_battery_warning_threshold_text)).setText(
+					getString(R.string.low_battery_warning_threshold_text) + " -- %");
+		} else {
+			((TextView) findViewById(R.id.low_battery_warning_threshold_text)).setText(
+					getString(R.string.low_battery_warning_threshold_text) + " " + lowBatteryWarningThreshold + " %");
+		}	
+	}
+
+	private void updateTimeToSleepTimerDisplay() {
+		SimpleDateFormat formatter = new SimpleDateFormat("mm.ss");
+		if(timeToSleepDuration==0){
+			((TextView) findViewById(R.id.time_to_sleep_timeset_text)).setText(
+					getString(R.string.time_to_sleep_timeset_text_part1) 
+					+ " --.-- " 
+					+ getString(R.string.time_to_sleep_timeset_text_part2));
+		} else {
+			((TextView) findViewById(R.id.time_to_sleep_timeset_text)).setText(
+					getString(R.string.time_to_sleep_timeset_text_part1) 
+					+ " " 
+					+  formatter.format(new Date(timeToSleepDuration)) 
+					+ " " + getString(R.string.time_to_sleep_timeset_text_part2));
+		}	
+	}
+
+	private void showLowBatteryWarningPopup() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		final View view = SettingsActivity.this.getLayoutInflater().inflate(R.layout.threshold_setting_dialog, null);
+		builder.setTitle("Threshold" +" (" + lowBatteryWarningThreshold + "%)")
+		.setView(view)
+		.setCancelable(false)
+		.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				lowBatteryWarningThreshold = ((SeekBar)view.findViewById(R.id.seekbar)).getProgress()*10;
+				updateLowBatteryWarningThresholdDisplay();
+			}
+		})
+		.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				//do things
+			}
+		});
+		final AlertDialog alert = builder.create();
+		alert.show();	
+
+		SeekBar seekBar = (SeekBar)alert.findViewById(R.id.seekbar);
+		seekBar.setMax(10);
+		seekBar.setProgress(ph.getLowBatteryWarningThreshold()/10);
+		seekBar.setSecondaryProgress(ph.getLowBatteryWarningThreshold()/10);
+		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){ 
+			@Override 
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { 
+				alert.setTitle("Threshold (" + String.valueOf(progress*10) + "%)");
+			} 
+			@Override 
+			public void onStartTrackingTouch(SeekBar seekBar) { 
+			} 
+			@Override 
+			public void onStopTrackingTouch(SeekBar seekBar) { 
+			} 
+		}); 
+
+	}
+
+	private void showAutoShutDownPopup() {
+
+		final SimpleDateFormat formatter = new SimpleDateFormat("mm.ss");
+		//Date dateStr = formatter.parse(strDate);
+		//String formattedDate = formatter.format(dateStr);
+
+		final List<String> possibleTimers = new ArrayList<String>();
+		possibleTimers.add("00.00");
+		possibleTimers.add("00.15");
+		possibleTimers.add("00.30");
+		possibleTimers.add("00.45");
+		possibleTimers.add("01.00");
+		possibleTimers.add("01.15");
+		possibleTimers.add("01.30");
+		possibleTimers.add("01.45");
+		possibleTimers.add("02.00");
+		possibleTimers.add("02.15");
+		possibleTimers.add("02.30");
+		possibleTimers.add("02.45");
+		possibleTimers.add("03.00");
+
+		// Current saved setting
+		Date currentSetting = new Date(ph.getTimeToSleepAsMs());
+		String formattedDate = formatter.format(currentSetting);
+		int pos = possibleTimers.indexOf(formattedDate);
+
+		// Current session setting
+		Date currentSessionSetting = new Date(timeToSleepDuration);
+		String formattedSessionDate = formatter.format(currentSessionSetting);
+		int posSession = possibleTimers.indexOf(formattedSessionDate);
+
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		final View view = SettingsActivity.this.getLayoutInflater().inflate(R.layout.time_to_sleep_setting_dialog, null);
+		builder.setTitle("Time to sleep " +" (" + formattedSessionDate + " mins)")
+		.setView(view)
+		.setCancelable(false)
+		.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				int pos = ((SeekBar)view.findViewById(R.id.seekbar)).getProgress();
+				String dateStr = possibleTimers.get(pos);
+				Date date = null;
+				try {
+					date = formatter.parse(dateStr);
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				Calendar calendar = GregorianCalendar.getInstance();
+				calendar.setTime(date); 
+				long minute = calendar.get(Calendar.MINUTE);
+				long seconds = calendar.get(Calendar.SECOND);
+				timeToSleepDuration = minute*60000+seconds*1000;
+				updateTimeToSleepTimerDisplay();
+			}
+		})
+		.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				//do nothing
+			}
+		});
+		final AlertDialog alert = builder.create();
+		alert.show();	
+
+		SeekBar seekBar = (SeekBar)alert.findViewById(R.id.seekbar);
+		seekBar.setMax(possibleTimers.size()-1);
+		seekBar.setProgress(posSession);
+		seekBar.setSecondaryProgress(pos);
+		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){ 
+			@Override 
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { 
+				alert.setTitle("Time to sleep (" + possibleTimers.get(progress) + " mins)");
+			} 
+			@Override 
+			public void onStartTrackingTouch(SeekBar seekBar) { 
+			} 
+			@Override 
+			public void onStopTrackingTouch(SeekBar seekBar) { 
+			} 
+		}); 
+
+	}
+
+
+
 
 }

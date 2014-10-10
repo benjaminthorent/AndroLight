@@ -17,6 +17,8 @@ public class PreferencesHandler {
 		LIGHT_ON_START_UP,
 		TIME_TO_SLEEP_ACTIVATED,
 		TIME_TO_SLEEP_DURATION,
+		LOW_BATTERY_WARNING_ACTIVATED,
+		LOW_BATTERY_WARNING_THRESHOLD,
 		LANGUAGE_LOCALE;
 	}
 	
@@ -70,12 +72,21 @@ public class PreferencesHandler {
 		sharedPrefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
 	}
 
-	public void saveSettings(boolean lightOnStartUp, boolean timeToSleepActivated, long timeToSleep, String locale) {
+	public void saveSettings(
+			boolean lightOnStartUp, 
+			boolean timeToSleepActivated, 
+			long timeToSleep, 
+			boolean lowBatteryWarningActivated,
+			int lowBatteryWarningThreshold,
+			String locale) 
+	{
 		Editor edit = sharedPrefs.edit();
 		// Set changes to perform
 		edit.putBoolean(Settings.LIGHT_ON_START_UP.toString(), lightOnStartUp);
 		edit.putBoolean(Settings.TIME_TO_SLEEP_ACTIVATED.toString(), timeToSleepActivated);
 		edit.putLong(Settings.TIME_TO_SLEEP_DURATION.toString(), timeToSleep);
+		edit.putBoolean(Settings.LOW_BATTERY_WARNING_ACTIVATED.toString(), lowBatteryWarningActivated);
+		edit.putInt(Settings.LOW_BATTERY_WARNING_THRESHOLD.toString(), lowBatteryWarningThreshold);
 		edit.putString(Settings.LANGUAGE_LOCALE.toString(), locale);
 		// Save preferences
 		edit.apply();
@@ -106,6 +117,14 @@ public class PreferencesHandler {
 	
 	public String getLanguage(){
 		return sharedPrefs.getString(Settings.LANGUAGE_LOCALE.toString(), defaultLanguage);
+	}
+	
+	public boolean isLowBatteryWarningActivated(){
+		return sharedPrefs.getBoolean(Settings.LOW_BATTERY_WARNING_ACTIVATED.toString(), false);
+	}
+	
+	public int getLowBatteryWarningThreshold(){
+		return sharedPrefs.getInt(Settings.LOW_BATTERY_WARNING_THRESHOLD.toString(), 0);
 	}
 	
 	public int getDefaultLanguageIndex(){

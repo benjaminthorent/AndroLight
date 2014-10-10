@@ -21,12 +21,53 @@
         android:src="@drawable/button_off" />
 
     <RelativeLayout
+        android:id="@+id/timer_section2"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dip"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/customborder"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        <SeekBar
+            android:id="@+id/seekbar222"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:progress="0" />
+
+        <TextView
+            android:id="@+id/timer_remaining_time3332"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/seekbar222"
+            android:gravity="center"
+            android:text="00:00"
+            android:textColor="#535353"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/reload444"
+            android:layout_width="20dip"
+            android:layout_height="20dip"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dip"
+            android:layout_toRightOf="@+id/timer_remaining_time3332"
+            android:background="@drawable/reload"
+            android:contentDescription="@string/description_none" />
+    </RelativeLayout>
+
+    <RelativeLayout
         android:id="@+id/timer_section"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_marginBottom="10dip" >
+        android:layout_marginBottom="10dip"
+        android:visibility="gone" >
 
         <LinearLayout
             android:id="@+id/progress"

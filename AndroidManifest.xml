@@ -33,38 +33,13 @@
         </activity>
         
         <activity android:name=".SettingsActivity" 
-            android:label="@string/settings"
+            android:label="@string/settings_activity_title"
             android:parentActivityName="com.benfactory.light.LightActivity"
             android:screenOrientation="portrait" 
             android:configChanges="orientation|keyboardHidden"
             android:windowSoftInputMode="stateHidden">            
         </activity>
-        
-        <activity android:name=".Settings2Activity" 
-            android:label="@string/settings"
-            android:parentActivityName="com.benfactory.light.LightActivity"
-            android:screenOrientation="portrait" 
-            android:configChanges="orientation|keyboardHidden"
-            android:windowSoftInputMode="stateHidden">            
-        </activity>
-        
-        <activity android:name=".MoreInfoActivity" 
-            android:theme="@style/FullscreenTheme"
-            android:label="@string/more_info"
-            android:parentActivityName="com.benfactory.light.LightActivity"
-            android:screenOrientation="portrait" 
-            android:configChanges="orientation|keyboardHidden"
-            android:windowSoftInputMode="stateHidden">    
-        </activity>
-        
-        <activity android:name=".SupportMeActivity" 
-            android:label="@string/give_me_a_beer"
-            android:parentActivityName="com.benfactory.light.LightActivity"
-            android:screenOrientation="portrait" 
-            android:configChanges="orientation|keyboardHidden"
-            android:windowSoftInputMode="stateHidden">    
-        </activity>
-        
+                
     </application>
 
 </manifest>

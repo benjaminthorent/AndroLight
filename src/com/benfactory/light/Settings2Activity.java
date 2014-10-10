@@ -163,10 +163,10 @@ public class Settings2Activity extends Activity {
 				if((!((Switch)findViewById(R.id.time_to_sleep)).isChecked())||timeToSleepDuration>0){
 					Toast.makeText(getApplicationContext(), R.string.settingsUpdateOK, Toast.LENGTH_SHORT).show();
 					// Save preferences
-					ph.saveSettings(((Switch)findViewById(R.id.light_on_start_up)).isChecked(), 
+					/*ph.saveSettings(((Switch)findViewById(R.id.light_on_start_up)).isChecked(), 
 							((Switch)findViewById(R.id.time_to_sleep)).isChecked(), 
 							timeToSleepDuration, 
-							Language.getLocaleStringFromIndex(((Spinner)findViewById(R.id.language_spinner)).getSelectedItemPosition()));
+							Language.getLocaleStringFromIndex(((Spinner)findViewById(R.id.language_spinner)).getSelectedItemPosition()));*/
 					// End settings activity
 					endActivity();
 				} else {

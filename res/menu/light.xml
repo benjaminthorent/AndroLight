@@ -12,13 +12,5 @@
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
         android:title="@string/action_battery"/>
-    <item
-        android:id="@+id/action_more_info"
-        android:showAsAction="never"
-        android:title="@string/more_info"/>
-    <item
-        android:id="@+id/action_give_me_a_beer"
-        android:showAsAction="never"
-        android:title="@string/give_me_a_beer"/>
 
 </menu>
