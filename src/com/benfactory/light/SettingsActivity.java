@@ -212,11 +212,11 @@ public class SettingsActivity extends Activity {
 	}
 
 	private void showPopupSettingsUnsaved(){
-		if(ph.isSettingsWarningOnBackToBeShown()){
+		if(ph.isSettingsWarningOnBackToBeShown() && hasSettingsBeenUpdated()){
 			
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			final View view = SettingsActivity.this.getLayoutInflater().inflate(R.layout.settings_not_saved_dialog, null);
-			builder.setTitle("You will loose your settings !")
+			builder.setTitle("Unsaved changes settings !")
 			.setView(view)
 			.setCancelable(false)
 			.setPositiveButton(R.string.OKoption, new DialogInterface.OnClickListener() {
@@ -230,7 +230,11 @@ public class SettingsActivity extends Activity {
 			})
 			.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
-					//do nothing
+					if(((CheckBox)view.findViewById(R.id.deactivate_warning_checkbox)).isChecked()){
+						PreferencesHandler preferenceshandler = new PreferencesHandler(getApplicationContext());
+						preferenceshandler.deActivateShowSettingsWarningOnBack();
+					}
+					// Stay on setting page
 				}
 			})
 			.setIcon(android.R.drawable.ic_dialog_alert);
@@ -239,6 +243,27 @@ public class SettingsActivity extends Activity {
 		} else {
 			this.finish();
 		}
+	}
+	
+	private boolean hasSettingsBeenUpdated(){
+		boolean result = false;
+		// Auto shut down feature
+		if(!((CheckBox)findViewById(R.id.time_to_sleep_checkbox)).isChecked()){
+			result |= ph.isTimeToSleepActivated();
+		} else {
+			result |= (!ph.isTimeToSleepActivated() || (ph.getTimeToSleepAsMs()!=timeToSleepDuration));
+		}
+		// Low battery warning feature
+		if(!((CheckBox)findViewById(R.id.low_battery_warning_checkbox)).isChecked()){
+			result |= ph.isLowBatteryWarningActivated();
+		} else {
+			result |= (!ph.isLowBatteryWarningActivated() || (ph.getLowBatteryWarningThreshold()!=lowBatteryWarningThreshold));
+		}
+		// Auto light on on start up feature
+		result |= !(((CheckBox)findViewById(R.id.light_on_start_up_checkbox)).isChecked()==ph.isLightOnStartUp());
+		// Language
+		result |= !ph.getLanguage().equalsIgnoreCase(Language.getLocaleStringFromIndex(((Spinner)findViewById(R.id.language_spinner)).getSelectedItemPosition()));
+		return result;
 	}
 
 
