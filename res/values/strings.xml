@@ -1,9 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Light</string>
-    <string name="title_activity_light">LightActivity</string>
+    <!-- **** App and activities **** -->
+    <string name="app_name">AndroLight</string>
+    <string name="action_main">AndroLight</string>
     <string name="action_settings">Settings</string>
+    
+    <!-- **** Basic strings **** -->
+    <string name="OKoption">OK</string>
+    <string name="YESoption">Yes</string>
+    <string name="NOoption">No</string>
+    
+    <!-- **** Main activity **** -->
+    <!-- Batery info pop-up -->
+    <string name="battery_info_popup_title">Battery Information</string>
+    <string name="battery_level_info">"Battery level :</string>
+    <string name="battery_temperature_info">Temperature :</string>
+    <string name="battery_technology_info">Technology :</string>
+    <string name="battery_good_health_info">Good battery health !</string>
+    <string name="battery_bad_health_info">You might face some issues with your battery :(...</string>
+    <!-- Low battery warning pop-up -->
+    <string name="low_battery_warning_popup_title">Low Battery Warning</string>
+    <string name="low_battery_warning_popup_message_part1">The level of your battery (</string>
+    <string name="low_battery_warning_popup_message_part2">%) is below the threshold you defined (</string>
+    <string name="low_battery_warning_popup_message_part3">%)\n\nAre you sure you want to turn your flash on ?</string>
+    <!-- Flash not supported pop-up -->
+    <string name="flash_not_supported_popup_title">Flash not supported !</string>
+    <string name="flash_not_supported_popup_message">Sorry, your device doesn\'t support flash light!</string>
+    
+    
+    
     <string name="action_save">Save</string>
     <string name="main_button_decription">On/Off button</string>
     <string name="ligtOnStartupDescription">Light on startup</string>
@@ -15,7 +41,6 @@
     <string name="timeToSleepDialogTitle">Shut light down after (mins):</string>
     <string name="defaultTimeToSleepSuboption">2</string>
     <string name="settingsUpdateOK">Settings successfully updated !</string>
-    <string name="OKoption">OK</string>
     <string name="noTimeSet">--:--</string>
     <string name="application_logo_text">Application logo</string>
     <string name="settings_activity_title">Settings</string>

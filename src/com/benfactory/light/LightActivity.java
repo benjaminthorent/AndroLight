@@ -2,9 +2,8 @@ package com.benfactory.light;
 
 import java.io.IOException;
 import java.util.Locale;
-
 import javax.security.auth.callback.Callback;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContextWrapper;
@@ -28,7 +27,6 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class LightActivity extends Activity implements Callback, android.view.SurfaceHolder.Callback {
 
@@ -47,26 +45,15 @@ public class LightActivity extends Activity implements Callback, android.view.Su
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.home); 
 
-		/*
-		 * Perform actions to be checked when activity is started
-		 */
 		// Set app language as per settings
 		setAppLanguage();
 
-		/*
-		 * 
-		 */
+		// Set up a surface view on which the camera behavior will be attached to
 		SurfaceView preview = (SurfaceView)findViewById(R.id.PREVIEW);
 		mHolder = preview.getHolder();
 		mHolder.addCallback(this);
-
-
-		/*
-		 * Get and set all graphical elements 
-		 */
 
 		// OnOff Button
 		mainButton = (ImageButton) findViewById(R.id.main_button);
@@ -78,21 +65,11 @@ public class LightActivity extends Activity implements Callback, android.view.Su
 			}
 		});
 
-		// Settings Button
-		/*settingsButton = (ImageButton) findViewById(R.id.settings_button);
-		settingsButton.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				Intent intent = new Intent(LightActivity.this, SettingsActivity.class);
-				startActivity(intent);
-			}
-		});*/
-
 		// Timer section
 		timerSection = (RelativeLayout) findViewById(R.id.timer_section);
 		progressBar = (ProgressBar) findViewById(R.id.timer_progressbar);
 		remainingTime = (TextView) findViewById(R.id.timer_remaining_time);
 		reloadTimerButton = (ImageButton) findViewById(R.id.border);
-
 		reloadTimerButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				if(timer!=null) {
@@ -103,127 +80,143 @@ public class LightActivity extends Activity implements Callback, android.view.Su
 			}
 		});
 
-		/*
-		 * Update all display
-		 */
+		//Update all display
 		updateFullDisplay();
 	}
 
+	/**
+	 * Menu initialization 
+	 * Menu gives access to both settings and battery level
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.light, menu);
 		return true;
 	}
 
+	/**
+	 * Navigation bar items clicks handling
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle item selection
 		switch (item.getItemId()) {
 		case R.id.action_settings:
+			// Start dedicated settings activity
 			Intent settingsIntent = new Intent(LightActivity.this, SettingsActivity.class);
 			startActivity(settingsIntent);
 			return true;
 		case R.id.action_battery:
-			// TODO remove
-			PreferencesHandler preferenceshandler = new PreferencesHandler(getApplicationContext());
-			preferenceshandler.activateShowSettingsWarningOnBack();
-			// TODO end
-			
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			LayoutInflater inflater = LightActivity.this.getLayoutInflater();
-			builder.setTitle("Battery Information")
-			.setView(inflater.inflate(R.layout.battery_status_dialog, null))
-			.setCancelable(false)
-			.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					//do things
-				}
-			})
-			.setIcon(android.R.drawable.ic_dialog_info);
-			AlertDialog alert = builder.create();
-
-			alert.show();	
-
-			//Updates
-			Intent i = new ContextWrapper(getApplicationContext()).registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-			int temp =i.getIntExtra(BatteryManager.EXTRA_TEMPERATURE,0);
-			int level = i.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-			int scale = i.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-			int health = i.getIntExtra(BatteryManager.EXTRA_HEALTH, -1);
-			String tech = i.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY);
-			String healthStatus = (health==BatteryManager.BATTERY_HEALTH_GOOD ? "Good battery health !" : "You might face some issues with your battery :(...");
-
-			((TextView)alert.findViewById(R.id.battery_level)).setText("Battery level : " + level + "%");
-			((TextView)alert.findViewById(R.id.battery_temperature)).setText("Temperature : " + temp/10 + "°C");
-			((TextView)alert.findViewById(R.id.battery_technology)).setText("Technology : " + tech);
-			((TextView)alert.findViewById(R.id.battery_health)).setText(healthStatus);
-
+			// Display battery information pop-up
+			displayBatteryInfoPopup();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
 	}
 
-	@SuppressWarnings("deprecation")
+	@SuppressLint("InflateParams")
+	private void displayBatteryInfoPopup() {
+
+		// Set up pop- up basic display
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		LayoutInflater inflater = LightActivity.this.getLayoutInflater();
+		builder.setTitle(R.string.battery_info_popup_title)
+		.setView(inflater.inflate(R.layout.battery_status_dialog, null))
+		.setCancelable(false)
+		.setPositiveButton(R.string.OKoption, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				//do nothing, just close pop-up
+			}
+		})
+		.setIcon(android.R.drawable.ic_dialog_info);
+		AlertDialog alert = builder.create();
+		alert.show();	
+
+		// Update info inside view inflated in the pop-up view
+		Intent i = new ContextWrapper(getApplicationContext()).registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+		int temp =i.getIntExtra(BatteryManager.EXTRA_TEMPERATURE,0);
+		int level = i.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+		int health = i.getIntExtra(BatteryManager.EXTRA_HEALTH, -1);
+		String tech = i.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY);
+		String healthStatus = (health==BatteryManager.BATTERY_HEALTH_GOOD ? getString(R.string.battery_good_health_info) : getString(R.string.battery_bad_health_info));
+		((TextView)alert.findViewById(R.id.battery_level)).setText(getString(R.string.battery_level_info) + " " + level + "%");
+		((TextView)alert.findViewById(R.id.battery_temperature)).setText(getString(R.string.battery_temperature_info) + " " + temp/10 + "¡C");
+		((TextView)alert.findViewById(R.id.battery_technology)).setText(getString(R.string.battery_technology_info) + " " + tech);
+		((TextView)alert.findViewById(R.id.battery_health)).setText(healthStatus);
+	}
+
+	/**
+	 * Main method to handle behavior when turning light on
+	 */
 	private void lightOn() {
-		/*
-		 * First check if device is supporting flashlight or not
-		 */
-		boolean hasFlash = getApplicationContext().getPackageManager()
-				.hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
+		//First check if device is supporting flashlight or not
+		boolean hasFlash = getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
+
 
 		if (!hasFlash) {
-			// device doesn't support flash
-			// Show alert message and close the application
-			AlertDialog alert = new AlertDialog.Builder(LightActivity.this)
-			.create();
-			alert.setTitle("Error");
-			alert.setMessage("Sorry, your device doesn't support flash light!");
-			alert.setButton("OK", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					// closing the application
-					finish();
-				}
-			});
-			alert.show();
-			
+			// If device doesn't support flash, show alert message
+			displayFlashNotSupportedPopup();	
+			// Re update light status since in that case, light could not be turned on
 			lightIsOn = false;
-			
-			return;
 		} else {
+			// Get battery level
 			PreferencesHandler ph = new PreferencesHandler(getApplicationContext());
 			Intent i = new ContextWrapper(getApplicationContext()).registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 			int level = i.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
 			if(ph.isLowBatteryWarningActivated() && level < ph.getLowBatteryWarningThreshold()){
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle("Low Battery Warning")
-				.setMessage("The level of your battery (" + level 
-						+ "%) is below the threshold you defined (" 
-						+ ph.getLowBatteryWarningThreshold() 
-						+ "%)\n\nAre you sure you want to turn your flash on ?")
-				.setCancelable(false)
-				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						turnCameraLightOn();
-					}
-				})
-				.setNegativeButton("No", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						lightIsOn = false;
-					}
-				})
-				.setIcon(android.R.drawable.ic_dialog_info);
-				AlertDialog alert = builder.create();
-				alert.show();
-				
+				// If battery level below threshold defined in settings, display dedicated warning pop-up
+				displayLowBatteryWarningPopup(ph.getLowBatteryWarningThreshold(), level);
+
 			} else {
+				// If no issue foreseen with flash usage, concretely turn it on
 				turnCameraLightOn();
 			}
 
 		}
 
+	}
+
+	/**
+	 * 
+	 * @param thresholdInSettings
+	 * @param currentBatteryLevel
+	 */
+	private void displayLowBatteryWarningPopup(int thresholdInSettings, int currentBatteryLevel) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.low_battery_warning_popup_title))
+		.setMessage(getString(R.string.low_battery_warning_popup_message_part1) + currentBatteryLevel 
+				+ getString(R.string.low_battery_warning_popup_message_part2) 
+				+ thresholdInSettings + getString(R.string.low_battery_warning_popup_message_part3))
+				.setCancelable(false)
+				.setPositiveButton(getString(R.string.YESoption), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						turnCameraLightOn();
+					}
+				})
+				.setNegativeButton(getString(R.string.NOoption), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						lightIsOn = false;
+					}
+				})
+				.setIcon(android.R.drawable.ic_dialog_info);
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+
+	private void displayFlashNotSupportedPopup() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.flash_not_supported_popup_title))
+		.setMessage(getString(R.string.flash_not_supported_popup_message))
+		.setCancelable(false)
+		.setPositiveButton(R.string.OKoption, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				// closing the application
+				finish();
+			}
+		})
+		.setIcon(android.R.drawable.ic_dialog_alert);
+		AlertDialog alert = builder.create();
+		alert.show();
 	}
 
 	private void turnCameraLightOn() {
@@ -232,7 +225,6 @@ public class LightActivity extends Activity implements Callback, android.view.Su
 			try {
 				cam.setPreviewDisplay(mHolder);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			Parameters params = cam.getParameters();

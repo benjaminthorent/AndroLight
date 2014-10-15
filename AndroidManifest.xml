@@ -24,7 +24,7 @@
             android:name="com.benfactory.light.LightActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
-            android:label="@string/app_name"
+            android:label="@string/action_main"
             android:theme="@style/FullscreenTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
